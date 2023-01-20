@@ -5,6 +5,7 @@ const { toJSON, paginate } = require('./plugins');
 const jwt = require('jsonwebtoken');
 const vars = require('./../config/vars');
 const crypto = require('crypto');
+const { stringify } = require('querystring');
 
 const userSchema = mongoose.Schema(
   {
@@ -36,6 +37,13 @@ const userSchema = mongoose.Schema(
         }
       },
       private: true, // used by the toJSON plugin
+    },
+    address: {
+      type: String,
+    },
+    phone: {
+      type: String,
+      match: [/^(^\+251|^251|^0)?9\d{8}$/, 'Please add a valid phone number'],
     },
     avatar: {
       type: String,

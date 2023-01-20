@@ -33,6 +33,7 @@ const getUser = catchAsync(async (req, res) => {
 
 const updateUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
+  let { name, avatar } = req.body;
   const user = await userService.updateUserById(userId, req.body);
 
   res.status(httpStatus.OK).json(user);
@@ -40,9 +41,9 @@ const updateUser = catchAsync(async (req, res) => {
 
 const deleteUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  await userService.updateUserById(userId, { active: false });
+  await userService.deleteUserById(userId);
 
-  res.status(httpStatus.NO_CONTENT).json();
+  res.status(httpStatus.NO_CONTENT).json({ Message: 'Deleted' });
 });
 
 module.exports = {
