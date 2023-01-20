@@ -53,18 +53,27 @@ const getUserByEmail = async (email) => {
  * @param {Object} updateUserDto
  * @returns {Promise<User>}
  */
-const updateUserById = async (userId, updateUserDto) => {
-  const user = await getUserById(userId);
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-  }
+// const updateUserById = async (userId, updateUserDto) => {
+//   const user = await getUserById(userId);
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+//   }
 
-  if (updateUserDto.email && (await User.isEmailTaken(updateUserDto.email, userId))) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
+//   if (updateUserDto.email && (await User.isEmailTaken(updateUserDto.email, userId))) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Email already taken');
+//   }
 
-  Object.assign(user, updateUserDto);
-  await user.save();
+//   Object.assign(user, updateUserDto);
+//   await user.save();
+//   return user;
+// };
+
+const updateUserById = async (userId, fieldsUpdate) => {
+  const user = await User.findByIdAndUpdate(userId, fieldsUpdate, {
+    new: true,
+    runValidators: true,
+  });
+  if (!user) throw new AppError('This user does not exist');
   return user;
 };
 
