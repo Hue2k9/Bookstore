@@ -49,6 +49,19 @@ const userSchema = mongoose.Schema(
       type: String,
       default: 'default-avatar.jpg',
     },
+    authGoogleId: {
+      type: String,
+      default: null,
+    },
+    authFacebookId: {
+      type: String,
+      default: null,
+    },
+    authType: {
+      type: String,
+      enum: ['local', 'google', 'facebook'],
+      default: 'local',
+    },
     role: {
       type: String,
       enum: ['user', 'admin'],
@@ -112,11 +125,16 @@ userSchema.methods.isPasswordMatch = async function (password) {
 };
 
 userSchema.pre('save', async function (next) {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
+  try {
+    if (this.authType !== 'local') next();
+    const user = this;
+    if (user.isModified('password')) {
+      user.password = await bcrypt.hash(user.password, 8);
+      next();
+    }
+  } catch (error) {
+    next(error);
   }
-  next();
 });
 
 /**

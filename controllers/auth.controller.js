@@ -4,6 +4,19 @@ const catchAsync = require('../utils/catchAsync');
 const { authService, userService, emailService } = require('../services');
 const AppError = require('../utils/AppError');
 const e = require('express');
+const passport = require('passport');
+
+const authGoogle = catchAsync(async (req, res) => {
+  let user = req.user;
+  const accessToken = await user.signToken();
+  res.status(httpStatus.OK).json({ user, accessToken });
+});
+
+const authFacebook = catchAsync(async (req, res) => {
+  let user = req.user;
+  const accessToken = await user.signToken();
+  res.status(httpStatus.OK).json({ user, accessToken });
+});
 
 /**
  * Register with email and password
@@ -72,6 +85,8 @@ const registerStatus = catchAsync(async (req, res) => {
 });
 
 module.exports = {
+  authGoogle,
+  authFacebook,
   register,
   login,
   registerStatus,

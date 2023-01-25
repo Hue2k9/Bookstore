@@ -21,9 +21,9 @@ const getUsers = catchAsync(async (req, res) => {
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-
+  let { userId } = req.params;
   const user = await userService.getUserById(userId);
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
@@ -32,10 +32,14 @@ const getUser = catchAsync(async (req, res) => {
 });
 
 const updateUser = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-  let { name, avatar } = req.body;
-  const user = await userService.updateUserById(userId, req.body);
-
+  let userId = req.user._id;
+  console.log(userId);
+  let fieldsUpdate = {
+    name: req.body.name,
+    address: req.body.address,
+    phone: req.body.phone,
+  };
+  const user = await userService.updateUserById(userId, fieldsUpdate);
   res.status(httpStatus.OK).json(user);
 });
 
