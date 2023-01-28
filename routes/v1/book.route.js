@@ -1,20 +1,19 @@
 const express = require('express');
-var multer = require('multer');
 const bookController = require('../../controllers/book.controller');
-const { protect, restricTo } = require('../../middlewares/auth');
+const { protect, restrictTo } = require('../../middlewares/auth');
 const { uploadImagesMiddleware } = require('../../middlewares/upload');
 const router = express.Router();
 
 router
   .route('/')
-  .post(uploadImagesMiddleware, bookController.createBook)
+  .post(protect, restrictTo('admin'), uploadImagesMiddleware, bookController.createBook)
   .get(bookController.getBooks)
   .get(bookController.getBookBySlug);
 
 router
   .route('/:slug')
   .get(bookController.getBookBySlug)
-  .put(bookController.updateBookBySlug)
-  .delete(bookController.deleteBookBySlug);
+  .put(protect, restrictTo('admin'), bookController.updateBookBySlug)
+  .delete(protect, restrictTo('admin'), bookController.deleteBookBySlug);
 
 module.exports = router;

@@ -45,7 +45,7 @@ const getBookBySlug = catchAsync(async (req, res) => {
 
 const updateBookBySlug = catchAsync(async (req, res) => {
   let { slug } = req.params;
-  let title = req.body;
+  let { title } = req.body;
   let newslug;
   if (title) {
     newslug = slugify(title, {
