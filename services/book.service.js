@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
 const { Book } = require('../models');
 const AppError = require('../utils/AppError');
+const AdvancedQuery = require('../utils/advancedQuery');
+const { query } = require('express');
 
 /**
  * @param {Object} book
@@ -12,9 +14,15 @@ const createBook = async (book) => {
   return Book.create(book);
 };
 
-const getBooks = async () => {
-  const books = await Book.find({});
-  return books;
+/**
+ * get books
+ * @param {Object} book
+ * @param {Object} query
+ * @returns {Promise<Book>}
+ */
+const getBooks = async (book, query) => {
+  const features = new AdvancedQuery(Book.find(query).populate('cateGory', 'categoryName'), book).filter().sort().paginate();
+  return await features.query;
 };
 
 /**

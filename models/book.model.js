@@ -9,18 +9,14 @@ const bookSchema = mongoose.Schema(
       type: String,
       required: [true, 'Title is required'],
     },
-    price: {
-      type: Number,
-      required: [true, 'Price is required'],
-    },
+    price: Number,
     oldPrice: {
       type: Number,
       default: null,
     },
     cateGory: {
-      type: String,
-      enum: CategoryEnum,
-      required: [true, 'Category is required'],
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
     },
     illustration: {
       type: String,

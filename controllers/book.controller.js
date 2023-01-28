@@ -16,7 +16,16 @@ const createBook = catchAsync(async (req, res) => {
 });
 
 const getBooks = catchAsync(async (req, res) => {
-  const result = await bookService.getBooks();
+  let book = req.query;
+  let { price } = req.query;
+  let query = {};
+  //Get books by price from min to max
+  if (price) {
+    let [min, max] = price.split('-');
+    book.price = {};
+    query.price = { $gte: min, $lte: max };
+  }
+  const result = await bookService.getBooks(book, query);
   res.status(httpStatus.OK).json(result);
 });
 
