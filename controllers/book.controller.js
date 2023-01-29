@@ -2,7 +2,11 @@ const httpStatus = require('http-status');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 const { bookService, fileService } = require('../services');
+const fs = require('fs');
+const doc = require('file-convert');
+const PDFDocument = require('pdf-lib').PDFDocument;
 const slugify = require('slugify');
+const { OK } = require('http-status');
 
 const createBook = catchAsync(async (req, res) => {
   let files = await req.files;
@@ -71,6 +75,63 @@ const deleteBookBySlug = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json('Message: Deleted!');
 });
 
+const addPreview = catchAsync(async (req, res) => {
+  let file = req.file;
+  const options = {
+    libreofficeBin: process.env.LIBREO_OFFICE_BIN,
+    sourceFile: file.path,
+    outputDir: process.env.Book_Storage,
+    img: false,
+    imgExt: 'jpg',
+    reSize: 800,
+    density: 120,
+    disableExtensionCheck: true,
+  };
+
+  // Convert document to pdf and/or image
+  await doc
+    .convert(options)
+    .then((res) => {
+      console.log('Convert pdf successfully!\n', res);
+    })
+    .catch((e) => {
+      console.log('e', e);
+    });
+
+  //Read file
+  let name = file.originalname;
+  let newName = name.split('.');
+  const docmentAsBytes = await fs.promises.readFile(`${process.env.Book_Storage}/${newName[0]}.pdf`);
+
+  // Read your PDFDocument
+  const pdfDoc = await PDFDocument.load(docmentAsBytes);
+  const numberOfPages = pdfDoc.getPages().length;
+  let numberReview = req.body.numberPagesDisplay;
+  await fileService.createPreview(req.params.id, { totalPages: numberOfPages, numberPagesDisplay: numberReview });
+
+  // Create a new "sub" document
+  const subDocument = await PDFDocument.create();
+  for (let i = 0; i < numberReview; i++) {
+    // copy the page at current index
+    const [copiedPage] = await subDocument.copyPages(pdfDoc, [i]);
+    // add page
+    subDocument.addPage(copiedPage);
+  }
+  const pdfBytes = await subDocument.save();
+  await writePdfBytesToFile(`${process.env.Book_Storage}/review-${name}.pdf`, pdfBytes);
+
+  fs.unlinkSync(`${process.env.Book_Storage}/${newName[0]}.pdf`);
+
+  let newFilePath = `${process.env.Book_Storage}/review-${name}.pdf`;
+  const newFile = { book: req.params.id, filePath: newFilePath, fileType: 'document' };
+  await fileService.createFile(newFile);
+  return res.status(httpStatus.OK).json(newFile);
+});
+
+function writePdfBytesToFile(fileName, pdfBytes) {
+  return fs.promises.writeFile(fileName, pdfBytes);
+}
+
 module.exports = {
   createBook,
   getBooks,
@@ -78,4 +139,5 @@ module.exports = {
   getBookBySlug,
   updateBookBySlug,
   deleteBookBySlug,
+  addPreview,
 };

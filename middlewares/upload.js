@@ -14,6 +14,18 @@ const storageImages = multer.diskStorage({
   },
 });
 
+//Storage files
+const storageFiles = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, process.env.Book_Storage);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = file.originalname;
+    cb(null, uniqueSuffix);
+    return uniqueSuffix;
+  },
+});
+
 //Filter images
 const imageFilter = (req, file, cb) => {
   if (file.mimetype == 'image/png' || file.mimetype == 'image/jpg' || file.mimetype == 'image/jpeg') {
@@ -29,9 +41,15 @@ const uploadImages = multer({
   fileFilter: imageFilter,
 });
 
+const uploadFiles = multer({ storage: storageFiles });
+
 //Save multiple images
 const uploadImagesMiddleware = util.promisify(uploadImages.array('images', 10));
 
+//Save a book
+const uploadFileMiddleware = util.promisify(uploadFiles.single('file'));
+
 module.exports = {
   uploadImagesMiddleware,
+  uploadFileMiddleware,
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const bookController = require('../../controllers/book.controller');
 const { protect, restrictTo } = require('../../middlewares/auth');
-const { uploadImagesMiddleware } = require('../../middlewares/upload');
+const { uploadImagesMiddleware, uploadFileMiddleware } = require('../../middlewares/upload');
 const router = express.Router();
 
 router
@@ -15,5 +15,7 @@ router
   .get(bookController.getBookBySlug)
   .put(protect, restrictTo('admin'), bookController.updateBookBySlug)
   .delete(protect, restrictTo('admin'), bookController.deleteBookBySlug);
+
+router.route('/preview/:id').post(protect, restrictTo('admin'), uploadFileMiddleware, bookController.addPreview);
 
 module.exports = router;

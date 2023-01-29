@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { File } = require('../models');
+const { File, Book } = require('../models');
 const AppError = require('../utils/AppError');
 
 /**
@@ -11,6 +11,19 @@ const createFile = async (file) => {
   return File.create(file);
 };
 
+/**
+ * Update book review
+ * @param {ObjectId} id
+ * @param {Object} fieldsUpdate
+ * @returns
+ */
+const createPreview = async (id, fieldsUpdate) => {
+  let book = await Book.findById(id);
+  if (!book) throw new AppError('Book Id not found');
+  return await Book.findByIdAndUpdate(id, fieldsUpdate);
+};
+
 module.exports = {
   createFile,
+  createPreview,
 };
