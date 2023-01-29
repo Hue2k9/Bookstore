@@ -4,6 +4,7 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const bookRoute = require('./book.route');
 const categoryRoute = require('./category.route');
+const transactionRoute = require('./transaction.route');
 const { env } = require('../../config/vars');
 
 const router = express.Router();
@@ -24,6 +25,10 @@ const defaultRoutes = [
   {
     path: '/category',
     route: categoryRoute,
+  },
+  {
+    path: '/transactions',
+    route: transactionRoute,
   },
 ];
 
