@@ -7,6 +7,7 @@ const doc = require('file-convert');
 const PDFDocument = require('pdf-lib').PDFDocument;
 const slugify = require('slugify');
 const { OK } = require('http-status');
+const officegen = require('officegen');
 
 const createBook = catchAsync(async (req, res) => {
   let files = await req.files;
@@ -132,6 +133,42 @@ function writePdfBytesToFile(fileName, pdfBytes) {
   return fs.promises.writeFile(fileName, pdfBytes);
 }
 
+const readOffice = catchAsync(async (req, res) => {
+  console.log('hello world');
+  // Read the .docx file
+  let docx = officegen('docx');
+  let file = req.file.originalname;
+  console.log(file);
+  let stream = fs.createReadStream(file);
+  docx.on('error', function (err) {
+    console.log(err);
+  });
+  // Parse the .docx file
+  let totalPages = 0;
+  let totalParagraphs = 0;
+  docx.on('pageCount', function (count) {
+    totalPages = count;
+  });
+  docx.on('readable', function () {
+    let paragraph;
+    while ((paragraph = docx.read())) {
+      if (paragraph.type === 'Text') {
+        totalParagraphs++;
+      }
+    }
+  });
+  // Read the stream
+  stream.pipe(docx);
+
+  // Log the results
+  stream.on('end', function () {
+    console.log('Total Pages:', totalPages);
+    console.log('Total Paragraphs:', totalParagraphs);
+  });
+  // Read the stream
+  stream.pipe(docx);
+});
+
 module.exports = {
   createBook,
   getBooks,
@@ -140,4 +177,5 @@ module.exports = {
   updateBookBySlug,
   deleteBookBySlug,
   addPreview,
+  readOffice,
 };

@@ -12,6 +12,11 @@ const transactionSchema = mongoose.Schema(
       enum: ['wait for confirmation', 'confirmed', 'delivering', 'delivered'],
       default: 'wait for confirmation',
     },
+    payStatus: {
+      type: String,
+      enum: ['unpaid', 'paid'],
+      default: ['unpaid'],
+    },
     book: {
       type: Schema.Types.ObjectId,
       ref: 'Book',
@@ -21,6 +26,11 @@ const transactionSchema = mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       require: true,
+    },
+    transactionType: {
+      type: String,
+      enum: ['direct', 'online'],
+      default: 'direct',
     },
   },
   {

@@ -2,9 +2,13 @@ const { port, env } = require('./config/vars');
 const logger = require('./config/logger');
 const app = require('./app');
 const mongoose = require('./config/mongoose');
+const redis = require('./config/redis');
 
 // open mongoose connection
 mongoose.connect();
+
+//open redis connection
+redis.connect();
 
 // listen to requests
 const server = app.listen(port, () => logger.info(`server started on port ${port} (${env})`));
