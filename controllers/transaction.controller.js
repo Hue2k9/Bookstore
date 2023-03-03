@@ -100,20 +100,20 @@ const addVNPayTransaction = catchAsync(async (req, res) => {
 
   let dateFormat = require('dateformat');
   let date = await new Date();
-  const createDate = moment.tz(date, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYYMMDDHHmmss');
+  let createDate = moment.tz(date, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYYMMDDHHmmss');
   let orderId = dateFormat(date, 'yyyymmddHHmmss');
   let amount = req.body.amount;
   let bankCode = req.body.bankCode;
 
-  var orderInfo = `OrderId: ${req.params.id} Description: ${req.body.orderDescription} 
+  let orderInfo = `OrderId: ${req.params.id} Description: ${req.body.orderDescription} 
                    ${moment.tz(date, 'UTC').tz('Asia/Ho_Chi_Minh').format('YYYYMMDDHHmmss')}`;
-  var orderType = req.body.orderType;
-  var locale = req.body.language;
+  let orderType = req.body.orderType;
+  let locale = req.body.language;
   if (locale === null || locale === '') {
     locale = 'vn';
   }
-  var currCode = 'VND';
-  var vnp_Params = {};
+  let currCode = 'VND';
+  let vnp_Params = {};
   vnp_Params['vnp_Version'] = '2.1.0';
   vnp_Params['vnp_Command'] = 'pay';
   vnp_Params['vnp_TmnCode'] = tmnCode;
@@ -133,11 +133,11 @@ const addVNPayTransaction = catchAsync(async (req, res) => {
 
   vnp_Params = sortObject(vnp_Params);
 
-  var querystring = require('qs');
-  var signData = querystring.stringify(vnp_Params, { encode: false });
-  var crypto = require('crypto');
-  var hmac = crypto.createHmac('sha512', secretKey);
-  var signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+  let querystring = require('qs');
+  let signData = querystring.stringify(vnp_Params, { encode: false });
+  let crypto = require('crypto');
+  let hmac = crypto.createHmac('sha512', secretKey);
+  let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
   vnp_Params['vnp_SecureHash'] = signed;
   vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
@@ -185,9 +185,9 @@ const getVNPayTransaction = catchAsync(async (req, res) => {
 });
 
 function sortObject(obj) {
-  var sorted = {};
-  var str = [];
-  var key;
+  let sorted = {};
+  let str = [];
+  let key;
   for (key in obj) {
     if (obj.hasOwnProperty(key)) {
       str.push(encodeURIComponent(key));
